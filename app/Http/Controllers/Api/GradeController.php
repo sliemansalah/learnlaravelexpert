@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Interfaces\GradeControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Models\Grade;
 use Illuminate\Http\JsonResponse;
@@ -9,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
-class GradeController extends Controller
+class GradeController extends Controller implements GradeControllerInterface
 {
     /**
      * عرض قائمة جميع الدرجات

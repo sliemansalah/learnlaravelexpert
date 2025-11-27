@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Interfaces\ClassroomControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ClassroomController extends Controller
+class ClassroomController extends Controller implements ClassroomControllerInterface
 {
     /**
      * عرض قائمة جميع الفصول

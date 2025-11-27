@@ -76,7 +76,7 @@ Route::prefix('grades')->group(function () {
     Route::post('/', [GradeController::class, 'store']); // POST /api/grades
     Route::get('/search', [GradeController::class, 'search']); // GET /api/grades/search
     Route::get('/student/{student_id}', [GradeController::class, 'studentGrades']); // GET /api/grades/student/{student_id}
-    Route::get('/subject/{subject_id}', [GradeController::class, 'subjectGrades']); // GET /api/grades/subject/{subject_id}
+    Route::get('/subject/{subject_id}', [GradeController::class, 'subjectGrades']); // GET /api/grades/ /{subject_id}
     Route::get('/report/semester/{semester}', [GradeController::class, 'semesterReport']); // GET /api/grades/report/semester/{semester}
     Route::get('/{id}', [GradeController::class, 'show']); // GET /api/grades/{id}
     Route::put('/{id}', [GradeController::class, 'update']); // PUT /api/grades/{id}

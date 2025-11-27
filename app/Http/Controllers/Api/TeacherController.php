@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Interfaces\TeacherControllerInterface;
 use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class TeacherController extends Controller
+class TeacherController extends Controller implements TeacherControllerInterface
 {
     /**
      * عرض قائمة جميع المعلمين
