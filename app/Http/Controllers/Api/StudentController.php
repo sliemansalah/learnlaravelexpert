@@ -18,6 +18,7 @@ class StudentController extends Controller implements StudentControllerInterface
     public function index(): JsonResponse
     {
         $students = Student::with(['classroom', 'grades.subject'])
+            ->latest()
             ->get()
             ->map(function ($student) {
                 $student->gpa = $student->calculateGPA();

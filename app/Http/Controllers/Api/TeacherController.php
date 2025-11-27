@@ -19,6 +19,7 @@ class TeacherController extends Controller implements TeacherControllerInterface
     {
         $teachers = Teacher::with(['classroom', 'subjects'])
             ->withCount('subjects')
+            ->latest()
             ->get();
 
         return response()->json([
