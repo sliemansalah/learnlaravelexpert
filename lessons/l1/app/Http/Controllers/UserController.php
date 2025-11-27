@@ -74,4 +74,20 @@ class UserController extends Controller
             'posts' => $posts
         ]);
     }
+
+    public function get_profile($user_id, Request $request) {
+        $user= User::find($user_id);
+        if (!$user) {
+            return response()->json([
+                'message' => 'المستخدم غير موجود'
+            ], 404);
+        };
+        $profile = $user->profile;
+        return response()->json([
+            'user_name'=> $user->name,
+            'user_email'=> $user->email,
+            'user_bio'=>$profile->bio,
+            'user_website'=>$profile->website,
+        ]);
+    }
 }
