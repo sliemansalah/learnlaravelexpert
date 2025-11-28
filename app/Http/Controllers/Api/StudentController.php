@@ -178,11 +178,7 @@ class StudentController extends Controller implements StudentControllerInterface
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'student' => $student->only(['id', 'name']),
-                'grades' => $student->grades,
-                'gpa' => $student->calculateGPA(),
-            ],
+            'data' => $student->grades,
         ]);
     }
 
