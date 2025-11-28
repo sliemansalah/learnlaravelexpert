@@ -53,10 +53,47 @@
 
         <!-- Student Grades -->
         <div class="col-md-8">
+            <!-- Statistics Card -->
             <div class="card mb-4">
                 <div class="card-header bg-transparent">
                     <h5 class="mb-0">
-                        <i class="fas fa-chart-line"></i> الدرجات
+                        <i class="fas fa-chart-bar"></i> الإحصائيات الأكاديمية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <h3 class="text-primary mb-2" id="total-subjects">0</h3>
+                                <p class="text-muted mb-0">إجمالي المواد</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <h3 class="text-success mb-2" id="first-semester-avg">0</h3>
+                                <p class="text-muted mb-0">معدل الفصل الأول</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <h3 class="text-info mb-2" id="second-semester-avg">0</h3>
+                                <p class="text-muted mb-0">معدل الفصل الثاني</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <h3 class="text-warning mb-2" id="final-gpa">0</h3>
+                                <p class="text-muted mb-0">المعدل النهائي</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> الدرجات حسب المواد
                     </h5>
                 </div>
                 <div class="card-body">
@@ -70,39 +107,8 @@
                 </div>
             </div>
 
-            <!-- Statistics Card -->
-            <div class="card">
-                <div class="card-header bg-transparent">
-                    <h5 class="mb-0">
-                        <i class="fas fa-chart-bar"></i> الإحصائيات
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <h3 class="text-primary mb-2" id="total-subjects">0</h3>
-                                <p class="text-muted mb-0">إجمالي المواد</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <h3 class="text-success mb-2" id="average-grade">0</h3>
-                                <p class="text-muted mb-0">المعدل العام</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <h3 class="text-info mb-2" id="age">0</h3>
-                                <p class="text-muted mb-0">العمر</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Parent Information Card -->
-            <div class="card mt-4">
+            <div class="card">
                 <div class="card-header bg-transparent">
                     <h5 class="mb-0">
                         <i class="fas fa-users"></i> معلومات ولي الأمر
@@ -196,6 +202,10 @@
                     <strong>${new Date(student.birth_date).toLocaleDateString('ar-EG')}</strong>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="text-muted">العمر:</span>
+                    <strong id="age-display">-</strong>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">الصف:</span>
                     <strong>${student.classroom?.grade_level || '-'}</strong>
                 </div>
@@ -230,10 +240,10 @@
             </div>
         `;
 
-        // Calculate age
+        // Calculate and display age
         const birthDate = new Date(student.birth_date);
         const age = Math.floor((new Date() - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
-        document.getElementById('age').textContent = age;
+        document.getElementById('age-display').textContent = `${age} سنة`;
     }
 
     // Load student grades
@@ -255,57 +265,129 @@
             document.getElementById('grades-list').innerHTML = `
                 <div class="alert alert-info">لا توجد درجات مسجلة لهذا الطالب</div>
             `;
-            document.getElementById('average-grade').textContent = '0';
             document.getElementById('total-subjects').textContent = '0';
+            document.getElementById('first-semester-avg').textContent = '0';
+            document.getElementById('second-semester-avg').textContent = '0';
+            document.getElementById('final-gpa').textContent = '0';
             return;
         }
 
-        // Calculate unique subjects count
-        const uniqueSubjects = new Set(grades.map(grade => grade.subject_id));
-        document.getElementById('total-subjects').textContent = uniqueSubjects.size;
+        // Group grades by subject
+        const subjectGrades = {};
+        grades.forEach(grade => {
+            const subjectId = grade.subject_id;
+            if (!subjectGrades[subjectId]) {
+                subjectGrades[subjectId] = {
+                    subject: grade.subject,
+                    first: [],
+                    second: [],
+                    all: []
+                };
+            }
+            subjectGrades[subjectId].all.push(grade);
+            if (grade.semester === 'first') {
+                subjectGrades[subjectId].first.push(grade);
+            } else if (grade.semester === 'second') {
+                subjectGrades[subjectId].second.push(grade);
+            }
+        });
 
-        // Calculate average
-        const totalGrade = grades.reduce((sum, grade) => sum + parseFloat(grade.score), 0);
-        const average = (totalGrade / grades.length).toFixed(2);
-        document.getElementById('average-grade').textContent = average;
+        // Calculate statistics
+        const uniqueSubjects = Object.keys(subjectGrades).length;
+        document.getElementById('total-subjects').textContent = uniqueSubjects;
 
-        document.getElementById('grades-list').innerHTML = `
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>المادة</th>
-                            <th>الفصل الدراسي</th>
-                            <th>نوع الامتحان</th>
-                            <th>الدرجة</th>
-                            <th>التقدير</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${grades.map(grade => {
-                            const score = parseFloat(grade.score);
-                            return `
-                                <tr>
-                                    <td>
-                                        <a href="/subjects/${grade.subject_id}" class="text-decoration-none">
-                                            ${grade.subject?.name || 'N/A'}
-                                        </a>
-                                    </td>
-                                    <td>${getSemesterLabel(grade.semester)}</td>
-                                    <td>${getExamTypeLabel(grade.exam_type)}</td>
-                                    <td><strong>${score}</strong></td>
-                                    <td>
-                                        <span class="badge bg-${getGradeColor(score)}">
-                                            ${getGradeLabel(score)}
-                                        </span>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
+        // Calculate semester averages
+        const firstSemesterGrades = grades.filter(g => g.semester === 'first');
+        const secondSemesterGrades = grades.filter(g => g.semester === 'second');
+
+        const firstAvg = firstSemesterGrades.length > 0
+            ? (firstSemesterGrades.reduce((sum, g) => sum + parseFloat(g.score), 0) / firstSemesterGrades.length).toFixed(2)
+            : '0';
+        const secondAvg = secondSemesterGrades.length > 0
+            ? (secondSemesterGrades.reduce((sum, g) => sum + parseFloat(g.score), 0) / secondSemesterGrades.length).toFixed(2)
+            : '0';
+        const finalGPA = (grades.reduce((sum, g) => sum + parseFloat(g.score), 0) / grades.length).toFixed(2);
+
+        document.getElementById('first-semester-avg').textContent = firstAvg;
+        document.getElementById('second-semester-avg').textContent = secondAvg;
+        document.getElementById('final-gpa').textContent = finalGPA;
+
+        // Build grades table grouped by subject
+        let tableHTML = '';
+        Object.values(subjectGrades).forEach(subjectData => {
+            const subjectAvg = (subjectData.all.reduce((sum, g) => sum + parseFloat(g.score), 0) / subjectData.all.length).toFixed(2);
+            const firstAvg = subjectData.first.length > 0
+                ? (subjectData.first.reduce((sum, g) => sum + parseFloat(g.score), 0) / subjectData.first.length).toFixed(2)
+                : '-';
+            const secondAvg = subjectData.second.length > 0
+                ? (subjectData.second.reduce((sum, g) => sum + parseFloat(g.score), 0) / subjectData.second.length).toFixed(2)
+                : '-';
+
+            tableHTML += `
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <h6 class="mb-0">
+                                    <a href="/subjects/${subjectData.subject?.id}" class="text-decoration-none">
+                                        <i class="fas fa-book"></i> ${subjectData.subject?.name || 'N/A'}
+                                    </a>
+                                </h6>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <small class="text-muted">الفصل الأول</small>
+                                        <div><strong class="text-success">${firstAvg}</strong></div>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted">الفصل الثاني</small>
+                                        <div><strong class="text-info">${secondAvg}</strong></div>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted">المعدل النهائي</small>
+                                        <div><strong class="text-primary">${subjectAvg}</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>الفصل الدراسي</th>
+                                        <th>نوع الامتحان</th>
+                                        <th>الدرجة</th>
+                                        <th>التقدير</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${subjectData.all.map(grade => {
+                                        const score = parseFloat(grade.score);
+                                        return `
+                                            <tr>
+                                                <td>${getSemesterLabel(grade.semester)}</td>
+                                                <td>${getExamTypeLabel(grade.exam_type)}</td>
+                                                <td><strong>${score}</strong></td>
+                                                <td>
+                                                    <span class="badge bg-${getGradeColor(score)}">
+                                                        ${getGradeLabel(score)}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('grades-list').innerHTML = tableHTML;
     }
 
     // Get status color
