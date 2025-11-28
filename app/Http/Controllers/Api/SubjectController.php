@@ -70,7 +70,7 @@ class SubjectController extends Controller implements SubjectControllerInterface
      */
     public function show(string $id): JsonResponse
     {
-        $subject = Subject::with(['teacher', 'grades.student'])->find($id);
+        $subject = Subject::with(['teacher', 'classroom', 'grades.student'])->find($id);
 
         if (!$subject) {
             return response()->json([
@@ -171,11 +171,7 @@ class SubjectController extends Controller implements SubjectControllerInterface
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'subject' => $subject->only(['id', 'name', 'code']),
-                'students' => $subject->students,
-                'count' => $subject->enrolledStudentsCount(),
-            ],
+            'data' => $subject->students,
         ]);
     }
 
@@ -196,16 +192,7 @@ class SubjectController extends Controller implements SubjectControllerInterface
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'subject' => $subject->only(['id', 'name', 'code']),
-                'grades' => $subject->grades,
-                'statistics' => [
-                    'average' => $subject->averageScore(),
-                    'highest' => $subject->highestScore(),
-                    'lowest' => $subject->lowestScore(),
-                    'count' => $subject->grades->count(),
-                ],
-            ],
+            'data' => $subject->grades,
         ]);
     }
 

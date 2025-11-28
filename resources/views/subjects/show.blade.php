@@ -176,8 +176,8 @@
                     <strong><span class="badge bg-secondary">${subject.code}</span></strong>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <span class="text-muted">الساعات الأسبوعية:</span>
-                    <strong>${subject.weekly_hours} ساعة</strong>
+                    <span class="text-muted">الساعات المعتمدة:</span>
+                    <strong>${subject.credit_hours} ساعة</strong>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">الفصل:</span>
@@ -294,9 +294,9 @@
         }
 
         // Calculate average
-        const totalGrade = grades.reduce((sum, grade) => sum + parseFloat(grade.grade), 0);
+        const totalGrade = grades.reduce((sum, grade) => sum + parseFloat(grade.score), 0);
         const average = (totalGrade / grades.length).toFixed(2);
-        document.getElementById('average-grade').textContent = average + '%';
+        document.getElementById('average-grade').textContent = average;
 
         document.getElementById('grades-list').innerHTML = `
             <div class="table-responsive">
@@ -305,15 +305,14 @@
                         <tr>
                             <th>الطالب</th>
                             <th>الفصل الدراسي</th>
+                            <th>نوع الامتحان</th>
                             <th>الدرجة</th>
-                            <th>الحد الأقصى</th>
-                            <th>النسبة</th>
                             <th>التقدير</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${grades.map(grade => {
-                            const percentage = (parseFloat(grade.grade) / parseFloat(grade.max_grade)) * 100;
+                            const score = parseFloat(grade.score);
                             return `
                                 <tr>
                                     <td>
@@ -322,12 +321,11 @@
                                         </a>
                                     </td>
                                     <td>${getSemesterLabel(grade.semester)}</td>
-                                    <td><strong>${grade.grade}</strong></td>
-                                    <td>${grade.max_grade}</td>
-                                    <td>${percentage.toFixed(1)}%</td>
+                                    <td>${getExamTypeLabel(grade.exam_type)}</td>
+                                    <td><strong>${score}</strong></td>
                                     <td>
-                                        <span class="badge bg-${getGradeColor(percentage)}">
-                                            ${getGradeLabel(percentage)}
+                                        <span class="badge bg-${getGradeColor(score)}">
+                                            ${getGradeLabel(score)}
                                         </span>
                                     </td>
                                 </tr>
@@ -370,21 +368,33 @@
         return labels[semester] || semester;
     }
 
-    // Get grade color
-    function getGradeColor(percentage) {
-        if (percentage >= 85) return 'success';
-        if (percentage >= 70) return 'primary';
-        if (percentage >= 60) return 'warning';
+    // Get exam type label
+    function getExamTypeLabel(examType) {
+        const labels = {
+            'midterm': 'نصفي',
+            'final': 'نهائي',
+            'quiz': 'اختبار قصير',
+            'assignment': 'واجب'
+        };
+        return labels[examType] || examType;
+    }
+
+    // Get grade color based on score
+    function getGradeColor(score) {
+        if (score >= 90) return 'success';
+        if (score >= 80) return 'primary';
+        if (score >= 70) return 'info';
+        if (score >= 60) return 'warning';
         return 'danger';
     }
 
-    // Get grade label
-    function getGradeLabel(percentage) {
-        if (percentage >= 85) return 'ممتاز';
-        if (percentage >= 70) return 'جيد جدا';
-        if (percentage >= 60) return 'جيد';
-        if (percentage >= 50) return 'مقبول';
-        return 'راسب';
+    // Get grade label based on score
+    function getGradeLabel(score) {
+        if (score >= 90) return 'ممتاز (A)';
+        if (score >= 80) return 'جيد جداً (B)';
+        if (score >= 70) return 'جيد (C)';
+        if (score >= 60) return 'مقبول (D)';
+        return 'راسب (F)';
     }
 
     // Delete subject
