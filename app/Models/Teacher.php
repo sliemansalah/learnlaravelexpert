@@ -25,7 +25,7 @@ class Teacher extends Model
 
     // تحويل أنواع البيانات
     protected $casts = [
-        'hire_date' => 'date',
+        'hire_date' => 'date:Y-m-d',
         'salary' => 'decimal:2',
     ];
 

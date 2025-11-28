@@ -32,6 +32,15 @@ class Subject extends Model
     }
 
     /**
+     * علاقة غير مباشرة: الحصول على الفصل عبر المعلم
+     * Subject hasOneThrough Classroom
+     */
+    public function classroom(): BelongsTo
+    {
+        return $this->belongsTo(Classroom::class, 'teacher_id', 'teacher_id');
+    }
+
+    /**
      * علاقة Many-to-Many: المادة يدرسها عدة طلاب
      * Subject belongsToMany Students (عبر جدول grades)
      */

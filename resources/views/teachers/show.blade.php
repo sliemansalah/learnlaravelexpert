@@ -239,7 +239,7 @@
                                     </a>
                                 </td>
                                 <td>${subject.code}</td>
-                                <td>${subject.weekly_hours}</td>
+                                <td>${subject.credit_hours}</td>
                                 <td>
                                     <span class="badge bg-info">${subject.students_count || 0}</span>
                                 </td>

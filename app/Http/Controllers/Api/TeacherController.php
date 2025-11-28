@@ -19,7 +19,7 @@ class TeacherController extends Controller implements TeacherControllerInterface
     {
         $teachers = Teacher::with(['classroom', 'subjects'])
             ->withCount('subjects')
-            ->latest()
+            ->latest('hire_date')
             ->get();
 
         return response()->json([
@@ -153,7 +153,9 @@ class TeacherController extends Controller implements TeacherControllerInterface
      */
     public function subjects(string $id): JsonResponse
     {
-        $teacher = Teacher::with('subjects')->find($id);
+        $teacher = Teacher::with(['subjects.classroom', 'subjects' => function($query) {
+            $query->withCount('students');
+        }])->find($id);
 
         if (!$teacher) {
             return response()->json([
