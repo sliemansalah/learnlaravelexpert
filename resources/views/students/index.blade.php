@@ -183,8 +183,8 @@
                         ${student.gender === 'male' ? 'ذكر' : 'أنثى'}
                     </span>
                 </td>
-                <td>${new Date(student.date_of_birth).toLocaleDateString('ar-EG')}</td>
-                <td>${student.grade_level}</td>
+                <td>${new Date(student.birth_date).toLocaleDateString('ar-EG')}</td>
+                <td>${student.classroom?.grade_level || '-'}</td>
                 <td>${student.classroom?.name || '-'}</td>
                 <td>
                     <span class="badge bg-${getStatusColor(student.status)}">

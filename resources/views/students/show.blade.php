@@ -193,11 +193,11 @@
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">تاريخ الميلاد:</span>
-                    <strong>${new Date(student.date_of_birth).toLocaleDateString('ar-EG')}</strong>
+                    <strong>${new Date(student.birth_date).toLocaleDateString('ar-EG')}</strong>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">الصف:</span>
-                    <strong>${student.grade_level}</strong>
+                    <strong>${student.classroom?.grade_level || '-'}</strong>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">الفصل:</span>
@@ -221,17 +221,17 @@
             <div class="list-group list-group-flush">
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">اسم ولي الأمر:</span>
-                    <strong>${student.parent_name || '-'}</strong>
+                    <strong>${student.guardian_name || '-'}</strong>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="text-muted">هاتف ولي الأمر:</span>
-                    <strong>${student.parent_phone || '-'}</strong>
+                    <strong>${student.guardian_phone || '-'}</strong>
                 </div>
             </div>
         `;
 
         // Calculate age
-        const birthDate = new Date(student.date_of_birth);
+        const birthDate = new Date(student.birth_date);
         const age = Math.floor((new Date() - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
         document.getElementById('age').textContent = age;
     }
